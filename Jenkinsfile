@@ -91,6 +91,23 @@ pipeline {
                 """
             }
         }
+        stage("Trigger CD Pipeline") {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'JENKINS_API_TOKEN', variable: 'API_TOKEN')
+                ]) {
+                    sh """
+                      curl -s -k -X POST \
+                      --user admin:${API_TOKEN} \
+                      -H 'Content-Type: application/x-www-form-urlencoded' \
+                      --data 'IMAGE_TAG=${IMAGE_TAG}' \
+                      http://ec2-13-204-74-253.ap-south-1.compute.amazonaws.com:8080/job/Reddit-Clone-CD/buildWithParameters?token=gitops-token
+                    """
+            }
+         }
+            
+}
+
     }
          post {
             always {
